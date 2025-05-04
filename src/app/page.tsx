@@ -1,6 +1,5 @@
 "use client";
 
-import { DagreFlow } from "@/components/DagreFlow";
 import { ReactFlowProvider } from "@xyflow/react";
 /**
  * Home Page with React Flow Diagram
@@ -24,7 +23,7 @@ export default function Home() {
           {/* <FlowDiagram /> */}
           <FlowDiagram />
           {/* <DagreFlow /> */}
-          <DagreFlow />
+          {/* <DagreFlow /> */}
         </ReactFlowProvider>
       </div>
     </div>

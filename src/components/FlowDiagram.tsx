@@ -8,6 +8,7 @@
 "use client";
 
 import { useAnimate } from "@/utils/useAnimate";
+import { useLayoutedElements } from "@/utils/useLayoutedElements";
 import {
   addEdge,
   Background,
@@ -24,7 +25,7 @@ import {
   useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import SystemNode from "./SystemNode";
 import { initialEdges, initialNodes } from "./initialElements";
 const nodeTypes = {
@@ -36,6 +37,8 @@ export default function FlowDiagram() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [nodeName, setNodeName] = useState("");
+
+  const { getLayoutedElements } = useLayoutedElements();
 
   const instance = useReactFlow();
   console.log(instance.getNodes());
@@ -49,6 +52,10 @@ export default function FlowDiagram() {
     },
     [setEdges]
   );
+
+  useEffect(() => {
+    console.log("Nodes changed:", nodes);
+  }, [nodes]);
 
   // Add a new node to the diagram
   const addNode = useCallback(() => {
@@ -70,9 +77,26 @@ export default function FlowDiagram() {
       },
     };
 
-    setNodes((nds) => [...nds, newNode]);
+    setNodes((prev) => [...prev, newNode]);
+    const { nodes: layoutedNodes } = getLayoutedElements({
+      nodes,
+      edges,
+      direction: "TB",
+    });
+    layoutedNodes.map((node) =>
+      animate({
+        nodeId: node.id,
+        position: {
+          x: node.position.x,
+          y: node.position.y,
+        },
+        duration: 400,
+      })
+    );
+
     setNodeName("");
-  }, [nodeName, nodes.length, setNodes]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [animate, edges, getLayoutedElements, nodeName]);
 
   return (
     <div style={{ width: "100%", height: "600px" }}>
@@ -86,13 +110,13 @@ export default function FlowDiagram() {
         connectionMode={ConnectionMode.Loose}
         fitView
       >
-        <Controls />
-        <MiniMap />
+        <Controls className="bg-background text-foreground" />
+        <MiniMap className="bg-background" />
         <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
 
         <Panel
           position="top-right"
-          className="bg-white p-4 rounded-md shadow-md"
+          className="bg-background p-4 rounded-md shadow-md"
         >
           <h3 className="text-lg font-bold mb-2">Add Node</h3>
           <div className="flex gap-2">

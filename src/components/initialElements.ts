@@ -27,13 +27,6 @@ export const initialEdges: Edge[] = [
     animated: true,
     style: { stroke: "#0070f3", strokeWidth: 2 },
   },
-  {
-    id: "e5-5",
-    source: "5",
-    target: "5",
-    animated: true,
-    style: { stroke: "#0070f3", strokeWidth: 2 },
-  },
 ];
 
 // Initial nodes

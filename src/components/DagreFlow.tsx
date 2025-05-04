@@ -1,81 +1,30 @@
 "use client";
 
-import dagre from "@dagrejs/dagre";
+import { useLayoutedElements } from "@/utils/useLayoutedElements";
 import {
   addEdge,
   Background,
   Connection,
   ConnectionLineType,
-  Edge,
-  Node,
   Panel,
-  Position,
   ReactFlow,
   ReactFlowProvider,
   useEdgesState,
   useNodesState,
 } from "@xyflow/react";
-import { useCallback } from "react";
-
 import "@xyflow/react/dist/style.css";
-
+import { useCallback } from "react";
 import { initialEdges, initialNodes } from "./initialElements";
 
-const dagreGraph = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
-
-const nodeWidth = 172;
-const nodeHeight = 36;
-
-interface LayoutedElements {
-  nodes: Node[];
-  edges: Edge[];
-  direction?: "TB" | "LR";
-}
-
-const getLayoutedElements = ({
-  nodes,
-  edges,
-  direction = "TB",
-}: LayoutedElements): { nodes: Node[]; edges: Edge[] } => {
-  const isHorizontal = direction === "LR";
-  dagreGraph.setGraph({ rankdir: direction });
-
-  nodes.forEach((node) => {
-    dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
-  });
-
-  edges.forEach((edge) => {
-    dagreGraph.setEdge(edge.source, edge.target);
-  });
-
-  dagre.layout(dagreGraph);
-
-  const newNodes = nodes.map((node) => {
-    const nodeWithPosition = dagreGraph.node(node.id);
-    const newNode = {
-      ...node,
-      targetPosition: isHorizontal ? Position.Left : Position.Top,
-      sourcePosition: isHorizontal ? Position.Right : Position.Bottom,
-      // We are shifting the dagre node position (anchor=center center) to the top left
-      // so it matches the React Flow node anchor point (top left).
-      position: {
-        x: nodeWithPosition.x - nodeWidth / 2,
-        y: nodeWithPosition.y - nodeHeight / 2,
-      },
-    };
-
-    return newNode;
-  });
-
-  return { nodes: newNodes, edges };
-};
-
-const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements({
-  nodes: initialNodes,
-  edges: initialEdges,
-});
-
 const Flow = () => {
+  const { getLayoutedElements } = useLayoutedElements();
+
+  const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements({
+    nodes: initialNodes,
+    edges: initialEdges,
+    direction: "TB",
+  });
+
   const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(layoutedEdges);
 
@@ -87,7 +36,7 @@ const Flow = () => {
           eds
         )
       ),
-    []
+    [setEdges]
   );
   const onLayout = useCallback(
     (direction: "TB" | "LR") => {
@@ -101,7 +50,7 @@ const Flow = () => {
       setNodes([...layoutedNodes]);
       setEdges([...layoutedEdges]);
     },
-    [nodes, edges, setNodes, setEdges]
+    [getLayoutedElements, nodes, edges, setNodes, setEdges]
   );
 
   return (
@@ -114,7 +63,7 @@ const Flow = () => {
         onConnect={onConnect}
         connectionLineType={ConnectionLineType.SmoothStep}
         fitView
-        style={{ backgroundColor: "#F7F9FB" }}
+        style={{}}
       >
         <Panel position="top-right">
           <button className="xy-theme__button" onClick={() => onLayout("TB")}>

@@ -1,5 +1,6 @@
-'use client';
+"use client";
 
+import { DagreFlow } from "@/components/DagreFlow";
 import { ReactFlowProvider } from "@xyflow/react";
 /**
  * Home Page with React Flow Diagram
@@ -8,18 +9,22 @@ import { ReactFlowProvider } from "@xyflow/react";
 import dynamic from "next/dynamic";
 
 // Use dynamic import for the FlowDiagram component
-const FlowDiagram = dynamic(
-  () => import('@/components/FlowDiagram'),
-  { ssr: false }
-);
+const FlowDiagram = dynamic(() => import("@/components/FlowDiagram"), {
+  ssr: false,
+});
 
 export default function Home() {
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Next.js + Supabase + React Flow</h1>
+      <h1 className="text-2xl font-bold mb-4">
+        Next.js + Supabase + React Flow
+      </h1>
       <div className="border rounded-lg overflow-hidden">
         <ReactFlowProvider>
+          {/* <FlowDiagram /> */}
           <FlowDiagram />
+          {/* <DagreFlow /> */}
+          <DagreFlow />
         </ReactFlowProvider>
       </div>
     </div>

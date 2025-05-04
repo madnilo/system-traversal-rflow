@@ -7,29 +7,36 @@
  */
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useAnimate } from '@/utils/useAnimate';
 import {
-  ReactFlow,
-  MiniMap,
-  Controls,
-  Background,
-  useNodesState,
-  useEdgesState,
   addEdge,
-  Node,
-  Edge,
+  Background,
+  BackgroundVariant,
   Connection,
   ConnectionMode,
+  Controls,
+  Edge,
+  MarkerType,
+  MiniMap,
+  Node,
   Panel,
-  BackgroundVariant,
+  ReactFlow,
+  useEdgesState,
+  useNodesState,
+  useReactFlow
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import { useCallback, useState } from 'react';
+import SystemNode from './SystemNode';
+const nodeTypes = {
+  system: SystemNode
+};
 
 // Initial nodes
 const initialNodes: Node[] = [
   {
     id: '1',
-    type: 'input',
+    type: 'system',
     data: { label: 'Supabase Database' },
     position: { x: 250, y: 25 },
     style: {
@@ -44,6 +51,7 @@ const initialNodes: Node[] = [
   {
     id: '2',
     data: { label: 'Next.js API Routes' },
+    type: 'system',
     position: { x: 250, y: 150 },
     style: {
       background: '#000000',
@@ -58,6 +66,7 @@ const initialNodes: Node[] = [
     id: '3',
     data: { label: 'React Components' },
     position: { x: 250, y: 275 },
+    type: 'system',
     style: {
       background: '#0070f3',
       color: 'white',
@@ -69,13 +78,27 @@ const initialNodes: Node[] = [
   },
   {
     id: '4',
-    type: 'output',
+    type: 'system',
     data: { label: 'User Interface' },
     position: { x: 250, y: 400 },
     style: {
       background: '#6b21a8',
       color: 'white',
       border: '1px solid #4a1072',
+      borderRadius: '8px',
+      padding: '10px',
+      width: 180,
+    },
+  },
+  {
+    id: '5',
+    type: 'system',
+    data: { label: 'Nested' },
+    position: { x: 250, y: 525 },
+    style: {
+      background: '#3ECF8E',
+      color: 'white',
+      border: '1px solid #107969',
       borderRadius: '8px',
       padding: '10px',
       width: 180,
@@ -91,6 +114,10 @@ const initialEdges: Edge[] = [
     target: '2',
     animated: true,
     style: { stroke: '#3ECF8E', strokeWidth: 2 },
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+      color: '#3ECF8E',
+    },
   },
   {
     id: 'e2-3',
@@ -106,6 +133,13 @@ const initialEdges: Edge[] = [
     animated: true,
     style: { stroke: '#0070f3', strokeWidth: 2 },
   },
+  {
+    id: 'e5-5',
+    source: '5',
+    target: '5',
+    animated: true,
+    style: { stroke: '#0070f3', strokeWidth: 2 },
+  },
 ];
 
 export default function FlowDiagram() {
@@ -114,9 +148,16 @@ export default function FlowDiagram() {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [nodeName, setNodeName] = useState('');
 
+  const instance = useReactFlow();
+  console.log(instance.getNodes());
+  const { animate } = useAnimate({ instance });
+
   // Handle new connections between nodes
   const onConnect = useCallback(
-    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
+    (params: Connection) => {
+      console.log(params)
+      setEdges((eds) => addEdge(params, eds))
+    },
     [setEdges]
   );
 
@@ -148,6 +189,7 @@ export default function FlowDiagram() {
     <div style={{ width: '100%', height: '600px' }}>
       <ReactFlow
         nodes={nodes}
+        nodeTypes={nodeTypes}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
@@ -158,7 +200,7 @@ export default function FlowDiagram() {
         <Controls />
         <MiniMap />
         <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
-        
+
         <Panel position="top-right" className="bg-white p-4 rounded-md shadow-md">
           <h3 className="text-lg font-bold mb-2">Add Node</h3>
           <div className="flex gap-2">
@@ -174,6 +216,14 @@ export default function FlowDiagram() {
               className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
             >
               Add
+            </button>
+            <button
+              onClick={() => {
+                nodes.map(node => animate({ nodeId: node.id, position: { x: node.position.x + 100, y: node.position.y + 50 }, duration: 400 }));
+              }}
+              className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+            >
+              Shift Nodes
             </button>
           </div>
         </Panel>

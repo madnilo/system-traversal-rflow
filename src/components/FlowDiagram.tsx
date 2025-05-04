@@ -108,15 +108,14 @@ export default function FlowDiagram() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         connectionMode={ConnectionMode.Loose}
-        fitView
       >
-        <Controls className="bg-background text-foreground" />
-        <MiniMap className="bg-background" />
+        <Controls className="bg-background-panel text-foreground-text" />
+        <MiniMap className="bg-background-panel" />
         <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
 
         <Panel
           position="top-right"
-          className="bg-background p-4 rounded-md shadow-md"
+          className="bg-background-panel p-4 rounded-md shadow-md"
         >
           <h3 className="text-lg font-bold mb-2">Add Node</h3>
           <div className="flex gap-2">

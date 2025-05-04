@@ -1,26 +1,40 @@
 @import "tailwindcss";
 
+/* // Default light theme */
 :root {
-  --background: var(--color-slate-50);
-  --foreground: var(--color-cyan-950);
+  --background-void: var(--color-slate-100);
+  --background-board: var(--color-stone-50);
+  --background-panel: var(--color-white);
+  --background-node: var(--color-cyan-600);
+  --background-node-selected: var(--color-amber-300);
+  --foreground-text: var(--color-cyan-950);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background-void: var(--background-void);
+  --color-background-board: var(--background-board);
+  --color-background-panel: var(--background-panel);
+  --color-background-node: var(--background-node);
+  --color-background-node-selected: var(--background-node-selected);
+  --color-foreground-text: var(--foreground-text);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
+/* // Dark theme */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: var(--color-cyan-950);
-    --foreground: var(--color-stone-50);
+    --background-void: var(--color-gray-600);
+    --background-board: var(--color-stone-700);
+    --background-panel: var(--color-stone-900);
+    --background-node: var(--color-cyan-950);
+    --background-node-selected: var(--color-amber-800);
+    --foreground-text: var(--color-slate-50);
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--background-void);
+  color: var(--foreground-text);
   font-family: Arial, Helvetica, sans-serif;
 }

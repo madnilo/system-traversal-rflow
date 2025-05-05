@@ -7,25 +7,28 @@
  */
 "use client";
 
-import { useAnimate } from "@/utils/useAnimate";
-import { useLayoutedElements } from "@/utils/useLayoutedElements";
+import { useAddNode } from "@/utils/useAddNode";
+import { useFitViewMethod } from "@/utils/useAutoFitViewMethod";
+import { useAutoLayoutMethod } from "@/utils/useAutoLayoutMethod";
+import {
+  ArrowPathRoundedSquareIcon,
+  ArrowsPointingOutIcon,
+  SquaresPlusIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 import {
   addEdge,
   Background,
   BackgroundVariant,
   Connection,
   ConnectionMode,
-  Controls,
-  MiniMap,
-  Node,
   Panel,
   ReactFlow,
   useEdgesState,
   useNodesState,
-  useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import SystemNode from "./SystemNode";
 import { initialEdges, initialNodes } from "./initialElements";
 const nodeTypes = {
@@ -34,15 +37,14 @@ const nodeTypes = {
 
 export default function FlowDiagram() {
   // Use the hooks to manage nodes and edges
+  const [addingNode, toggleAddingNode] = useState(false);
+  const [nodeName, setNodeName] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [nodeName, setNodeName] = useState("");
-
-  const { getLayoutedElements } = useLayoutedElements();
-
-  const instance = useReactFlow();
-  console.log(instance.getNodes());
-  const { animate } = useAnimate({ instance });
+  const { fitView } = useFitViewMethod();
+  // useAutoLayout();
+  const { refreshLayout } = useAutoLayoutMethod();
 
   // Handle new connections between nodes
   const onConnect = useCallback(
@@ -53,50 +55,7 @@ export default function FlowDiagram() {
     [setEdges]
   );
 
-  useEffect(() => {
-    console.log("Nodes changed:", nodes);
-  }, [nodes]);
-
-  // Add a new node to the diagram
-  const addNode = useCallback(() => {
-    if (!nodeName) return;
-
-    const newNode: Node = {
-      id: `${nodes.length + 1}`,
-      data: { label: nodeName },
-      position: {
-        x: Math.random() * 500,
-        y: Math.random() * 500,
-      },
-      style: {
-        background: "#ff9900",
-        color: "white",
-        border: "1px solid #cc7a00",
-        borderRadius: "8px",
-        padding: "10px",
-      },
-    };
-
-    setNodes((prev) => [...prev, newNode]);
-    const { nodes: layoutedNodes } = getLayoutedElements({
-      nodes,
-      edges,
-      direction: "TB",
-    });
-    layoutedNodes.map((node) =>
-      animate({
-        nodeId: node.id,
-        position: {
-          x: node.position.x,
-          y: node.position.y,
-        },
-        duration: 400,
-      })
-    );
-
-    setNodeName("");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [animate, edges, getLayoutedElements, nodeName]);
+  const { addNode } = useAddNode();
 
   return (
     <div style={{ width: "100%", height: "600px" }}>
@@ -109,45 +68,60 @@ export default function FlowDiagram() {
         onConnect={onConnect}
         connectionMode={ConnectionMode.Loose}
       >
-        <Controls className="bg-background-panel text-foreground-text" />
-        <MiniMap className="bg-background-panel" />
+        {/* <Controls className="bg-background-panel text-foreground-text" /> */}
+        {/* <MiniMap className="bg-background-panel" /> */}
         <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
 
         <Panel
           position="top-right"
-          className="bg-background-panel p-4 rounded-md shadow-md"
+          className="bg-background-panel p-2 rounded-md shadow-md"
         >
-          <h3 className="text-lg font-bold mb-2">Add Node</h3>
           <div className="flex gap-2">
-            <input
-              type="text"
-              value={nodeName}
-              onChange={(e) => setNodeName(e.target.value)}
-              placeholder="Node name"
-              className="px-2 py-1 border rounded"
-            />
+            <div>
+              {addingNode && (
+                <input
+                  type="text"
+                  autoFocus
+                  value={nodeName}
+                  onChange={(e) => setNodeName(e.target.value)}
+                  onKeyUp={(e) => {
+                    if (e.key === "Enter") {
+                      addNode(nodeName);
+                      toggleAddingNode(false);
+                      setNodeName("");
+                    }
+                    if (e.key === "Escape") {
+                      setNodeName("");
+                      toggleAddingNode(false);
+                    }
+                  }}
+                  placeholder="System Name -> 'ENTER'"
+                  className="px-2 py-1 border rounded mr-2 h-8"
+                />
+              )}
+              <button
+                className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                onClick={() => toggleAddingNode(!addingNode)}
+              >
+                {!addingNode ? (
+                  <SquaresPlusIcon className="size-6 text-foreground-text inline-block" />
+                ) : (
+                  <XMarkIcon className="size-6 text-foreground-text inline-block" />
+                )}
+              </button>
+            </div>
+
             <button
-              onClick={addNode}
+              onClick={refreshLayout}
               className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
             >
-              Add
+              <ArrowPathRoundedSquareIcon className="size-6 text-foreground-text inline-block" />
             </button>
             <button
-              onClick={() => {
-                nodes.map((node) =>
-                  animate({
-                    nodeId: node.id,
-                    position: {
-                      x: node.position.x + 100,
-                      y: node.position.y + 50,
-                    },
-                    duration: 400,
-                  })
-                );
-              }}
+              onClick={fitView}
               className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
             >
-              Shift Nodes
+              <ArrowsPointingOutIcon className="size-6 text-foreground-text inline-block" />
             </button>
           </div>
         </Panel>

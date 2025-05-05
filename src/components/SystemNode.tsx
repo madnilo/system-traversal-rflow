@@ -6,26 +6,19 @@ type SystemNode = Node<{ label: string }, "string">;
 const handleStyle = { left: 10 };
 
 function SystemNode(props: NodeProps<SystemNode>) {
-  // const onChange = useCallback((evt: React.ChangeEvent<HTMLInputElement>) => {
-  //     console.log(evt?.target?.value);
-  // }, []);
-
   const { selected, data } = props;
-  console.log("data", props);
 
   return (
     <div
       className={classNames(
         "rounded-sm p-4 text-foreground-text",
+        `w-72 h-16 flex flex-col items-center justify-center font-semibold text-lg`,
         !selected && "outline-0 bg-background-node",
         selected && "outline-2 outline-amber-500 bg-background-node-selected"
       )}
     >
       <Handle type="target" position={Position.Top} />
       <div>
-        {/* <label htmlFor="text">Text:</label>
-                <input id="text" name="text" onChange={onChange} className="nodrag" />
-                 */}
         <span>{data.label}</span>
       </div>
       <Handle type="source" position={Position.Bottom} id="a" />

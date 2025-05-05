@@ -14,16 +14,11 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useCallback } from "react";
-import { initialEdges, initialNodes } from "./initialElements";
 
 const Flow = () => {
   const { getLayoutedElements } = useLayoutedElements();
 
-  const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements({
-    nodes: initialNodes,
-    edges: initialEdges,
-    direction: "TB",
-  });
+  const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements();
 
   const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(layoutedEdges);
@@ -38,20 +33,13 @@ const Flow = () => {
       ),
     [setEdges]
   );
-  const onLayout = useCallback(
-    (direction: "TB" | "LR") => {
-      const { nodes: layoutedNodes, edges: layoutedEdges } =
-        getLayoutedElements({
-          nodes,
-          edges,
-          direction,
-        });
+  const onLayout = useCallback(() => {
+    const { nodes: layoutedNodes, edges: layoutedEdges } =
+      getLayoutedElements();
 
-      setNodes([...layoutedNodes]);
-      setEdges([...layoutedEdges]);
-    },
-    [getLayoutedElements, nodes, edges, setNodes, setEdges]
-  );
+    setNodes([...layoutedNodes]);
+    setEdges([...layoutedEdges]);
+  }, [getLayoutedElements, setNodes, setEdges]);
 
   return (
     <div style={{ width: "100%", height: "600px" }}>
@@ -66,10 +54,10 @@ const Flow = () => {
         style={{}}
       >
         <Panel position="top-right">
-          <button className="xy-theme__button" onClick={() => onLayout("TB")}>
+          <button className="xy-theme__button" onClick={() => onLayout()}>
             vertical layout
           </button>
-          <button className="xy-theme__button" onClick={() => onLayout("LR")}>
+          <button className="xy-theme__button" onClick={() => onLayout()}>
             horizontal layout
           </button>
         </Panel>

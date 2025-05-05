@@ -8,8 +8,8 @@
 "use client";
 
 import { useAddNode } from "@/utils/useAddNode";
-import { useFitViewMethod } from "@/utils/useAutoFitViewMethod";
 import { useAutoLayoutMethod } from "@/utils/useAutoLayoutMethod";
+import { useFitViewMethod } from "@/utils/useFitViewMethod";
 import {
   ArrowPathRoundedSquareIcon,
   ArrowsPointingOutIcon,
@@ -29,10 +29,13 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useCallback, useState } from "react";
-import SystemNode from "./SystemNode";
 import { initialEdges, initialNodes } from "./initialElements";
+import LabeledGroupNodeDemo from "./nodes/LabeledGroupNodeDemo";
+import SystemNode from "./nodes/SystemNode";
+
 const nodeTypes = {
   system: SystemNode,
+  labeledGroupNode: LabeledGroupNodeDemo,
 };
 
 export default function FlowDiagram() {
@@ -67,9 +70,16 @@ export default function FlowDiagram() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         connectionMode={ConnectionMode.Loose}
+        onInit={(i) => {
+          i.zoomTo(-4).then(() => {
+            refreshLayout();
+          });
+        }}
+        fitView
       >
         {/* <Controls className="bg-background-panel text-foreground-text" /> */}
         {/* <MiniMap className="bg-background-panel" /> */}
+
         <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
 
         <Panel

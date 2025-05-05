@@ -1,5 +1,6 @@
 "use client";
 
+// import ShowRelatedNodes from "@/components/ShowRelatedNodes";
 import { ReactFlowProvider } from "@xyflow/react";
 /**
  * Home Page with React Flow Diagram
@@ -22,7 +23,7 @@ export default function Home() {
         <ReactFlowProvider>
           {/* <FlowDiagram /> */}
           <FlowDiagram />
-          {/* <DagreFlow /> */}
+          {/* <ShowRelatedNodes /> */}
           {/* <DagreFlow /> */}
         </ReactFlowProvider>
       </div>

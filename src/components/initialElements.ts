@@ -61,4 +61,29 @@ export const initialNodes: Node[] = [
     data: { label: "Nested" },
     position: { x: 250, y: 525 },
   },
+
+  {
+    id: "1p",
+    position: { x: 200, y: 200 },
+    data: { label: "Group Node" },
+    width: 380,
+    height: 200,
+    type: "labeledGroupNode",
+  },
+  {
+    id: "2p",
+    position: { x: 50, y: 100 },
+    data: { label: "Node" },
+    type: "default",
+    parentId: "1p",
+    extent: "parent",
+  },
+  {
+    id: "3p",
+    position: { x: 200, y: 50 },
+    data: { label: "Node" },
+    type: "default",
+    parentId: "1p",
+    extent: "parent",
+  },
 ];

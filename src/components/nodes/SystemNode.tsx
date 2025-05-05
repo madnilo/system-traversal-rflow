@@ -1,11 +1,9 @@
 import { classNames } from "@/utils/helpers";
 import { Handle, Node, NodeProps, Position } from "@xyflow/react";
 
-type SystemNode = Node<{ label: string }, "string">;
+type SystemNodeProps = Node<{ label: string }, "string">;
 
-const handleStyle = { left: 10 };
-
-function SystemNode(props: NodeProps<SystemNode>) {
+function SystemNode(props: NodeProps<SystemNodeProps>) {
   const { selected, data } = props;
 
   return (
@@ -21,13 +19,7 @@ function SystemNode(props: NodeProps<SystemNode>) {
       <div>
         <span>{data.label}</span>
       </div>
-      <Handle type="source" position={Position.Bottom} id="a" />
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        id="b"
-        style={handleStyle}
-      />
+      <Handle type="source" position={Position.Bottom} />
     </div>
   );
 }

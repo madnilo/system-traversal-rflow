@@ -36,22 +36,24 @@ const getLayoutedElements =
 
     dagre.layout(dagreGraph);
 
-    const newNodes = nodes.map((node) => {
-      const nodeWithPosition = dagreGraph.node(node.id);
-      const newNode = {
-        ...node,
-        targetPosition: isHorizontal ? Position.Left : Position.Top,
-        sourcePosition: isHorizontal ? Position.Right : Position.Bottom,
-        // We are shifting the dagre node position (anchor=center center) to the top left
-        // so it matches the React Flow node anchor point (top left).
-        position: {
-          x: nodeWithPosition.x - nodeWidth / 2,
-          y: nodeWithPosition.y - nodeHeight / 2,
-        },
-      };
+    const newNodes = nodes
+      .filter((node) => !node.parentId)
+      .map((node) => {
+        const nodeWithPosition = dagreGraph.node(node.id);
+        const newNode = {
+          ...node,
+          targetPosition: isHorizontal ? Position.Left : Position.Top,
+          sourcePosition: isHorizontal ? Position.Right : Position.Bottom,
+          // We are shifting the dagre node position (anchor=center center) to the top left
+          // so it matches the React Flow node anchor point (top left).
+          position: {
+            x: nodeWithPosition.x - nodeWidth / 2,
+            y: nodeWithPosition.y - nodeHeight / 2,
+          },
+        };
 
-      return newNode;
-    });
+        return newNode;
+      });
 
     return { nodes: newNodes, edges };
   };

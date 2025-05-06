@@ -10,6 +10,7 @@
 import { useAddNode } from "@/utils/useAddNode";
 import { useAutoLayoutMethod } from "@/utils/useAutoLayoutMethod";
 import { useFitViewMethod } from "@/utils/useFitViewMethod";
+import { useShowRelatedNodes } from "@/utils/useShowRelatedNodes";
 import {
   ArrowPathRoundedSquareIcon,
   ArrowsPointingOutIcon,
@@ -28,7 +29,7 @@ import {
   useNodesState,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { initialEdges, initialNodes } from "./initialElements";
 import LabeledGroupNodeDemo from "./nodes/LabeledGroupNodeDemo";
 import SystemNode from "./nodes/SystemNode";
@@ -60,13 +61,35 @@ export default function FlowDiagram() {
 
   const { addNode } = useAddNode();
 
+  const {
+    filteredNodes,
+    targetNodeId,
+    showRelatedNodes,
+    resetNodes,
+    onFilteredNodesChange,
+  } = useShowRelatedNodes();
+
+  useEffect(() => {
+    console.log("[DIAGRAM]Target node ID:", targetNodeId);
+  }, [targetNodeId]);
+
   return (
     <div style={{ width: "100%", height: "600px" }}>
       <ReactFlow
-        nodes={nodes}
+        nodes={
+          targetNodeId
+            ? filteredNodes
+            : nodes.map((node) => ({
+                ...node,
+                data: {
+                  ...node.data,
+                  onNodeDoubleClick: () => showRelatedNodes(node.id),
+                },
+              }))
+        }
+        onNodesChange={targetNodeId ? onFilteredNodesChange : onNodesChange}
         nodeTypes={nodeTypes}
         edges={edges}
-        onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         connectionMode={ConnectionMode.Loose}
@@ -82,59 +105,87 @@ export default function FlowDiagram() {
 
         <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
 
-        <Panel
-          position="top-right"
-          className="bg-background-panel p-2 rounded-md shadow-md"
-        >
-          <div className="flex gap-2">
-            <div>
-              {addingNode && (
-                <input
-                  type="text"
-                  autoFocus
-                  value={nodeName}
-                  onChange={(e) => setNodeName(e.target.value)}
-                  onKeyUp={(e) => {
-                    if (e.key === "Enter") {
-                      addNode(nodeName);
-                      toggleAddingNode(false);
-                      setNodeName("");
-                    }
-                    if (e.key === "Escape") {
-                      setNodeName("");
-                      toggleAddingNode(false);
-                    }
-                  }}
-                  placeholder="System Name -> 'ENTER'"
-                  className="px-2 py-1 border rounded mr-2 h-8"
-                />
-              )}
-              <button
-                className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                onClick={() => toggleAddingNode(!addingNode)}
-              >
-                {!addingNode ? (
-                  <SquaresPlusIcon className="size-6 text-foreground-text inline-block" />
-                ) : (
-                  <XMarkIcon className="size-6 text-foreground-text inline-block" />
+        {targetNodeId && (
+          <Panel
+            position="bottom-left"
+            className="bg-background-panel p-2 rounded-md shadow-md"
+          >
+            {/* <button
+            onClick={() => showRelatedNodes("1")}
+            className="rounded bg-blue-500 text-white px-4 py-2 disabled:opacity-50 mr-1"
+          >
+            Show related to Node 1
+          </button>
+          <button
+            onClick={() => showRelatedNodes("2")}
+            className="rounded bg-blue-500 text-white px-4 py-2 disabled:opacity-50 mr-1"
+          >
+            Show related to Node 2
+          </button> */}
+            <button
+              onClick={resetNodes}
+              className="rounded bg-blue-500 text-white px-4 py-2 disabled:opacity-50"
+            >
+              Reset
+            </button>
+          </Panel>
+        )}
+
+        {!targetNodeId && (
+          <Panel
+            position="top-right"
+            className="bg-background-panel p-2 rounded-md shadow-md"
+          >
+            <div className="flex gap-2">
+              <div>
+                {addingNode && (
+                  <input
+                    type="text"
+                    autoFocus
+                    value={nodeName}
+                    onChange={(e) => setNodeName(e.target.value)}
+                    onKeyUp={(e) => {
+                      if (e.key === "Enter") {
+                        addNode(nodeName);
+                        toggleAddingNode(false);
+                        setNodeName("");
+                      }
+                      if (e.key === "Escape") {
+                        setNodeName("");
+                        toggleAddingNode(false);
+                      }
+                    }}
+                    placeholder="System Name -> 'ENTER'"
+                    className="px-2 py-1 border rounded mr-2 h-8"
+                  />
                 )}
+                <button
+                  className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                  onClick={() => toggleAddingNode(!addingNode)}
+                >
+                  {!addingNode ? (
+                    <SquaresPlusIcon className="size-6 text-foreground-text inline-block" />
+                  ) : (
+                    <XMarkIcon className="size-6 text-foreground-text inline-block" />
+                  )}
+                </button>
+              </div>
+
+              <button
+                onClick={refreshLayout}
+                className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+              >
+                <ArrowPathRoundedSquareIcon className="size-6 text-foreground-text inline-block" />
+              </button>
+              <button
+                onClick={fitView}
+                className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+              >
+                <ArrowsPointingOutIcon className="size-6 text-foreground-text inline-block" />
               </button>
             </div>
-
-            <button
-              onClick={refreshLayout}
-              className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-            >
-              <ArrowPathRoundedSquareIcon className="size-6 text-foreground-text inline-block" />
-            </button>
-            <button
-              onClick={fitView}
-              className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-            >
-              <ArrowsPointingOutIcon className="size-6 text-foreground-text inline-block" />
-            </button>
-          </div>
-        </Panel>
+          </Panel>
+        )}
       </ReactFlow>
     </div>
   );

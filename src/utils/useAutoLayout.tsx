@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { TRANSITION_DURATION } from "./constants";
+import { TRANSITION_DURATION } from "../constants/values";
 import { useAnimate } from "./useAnimate";
 import { useLayoutedElements } from "./useLayoutedElements";
 

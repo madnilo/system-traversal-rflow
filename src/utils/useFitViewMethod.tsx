@@ -1,5 +1,5 @@
 import { useReactFlow } from "@xyflow/react";
-import { TRANSITION_DURATION } from "./constants";
+import { TRANSITION_DURATION } from "../constants/values";
 
 interface ReturnProps {
   fitView: () => void;
